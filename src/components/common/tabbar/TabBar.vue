@@ -20,7 +20,7 @@ export default {
   right: 0;
   bottom: 0;
   /* 阴影 */
-  box-shadow: 0px -10px 1px rgba(100, 100, 100, 0.08);
+  box-shadow: 0px -5px 1px rgba(100, 100, 100, 0.05);
 }
 
 </style>
