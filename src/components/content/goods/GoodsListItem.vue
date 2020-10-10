@@ -1,10 +1,10 @@
 <template>
-  <div class="goods-item">
-    <img :src="goodsItem.show.img" alt />
+  <div class="goods-item" @click="itemClick">
+    <img :src="goodsItem.show.img" @load="itemImgLoad" />
     <div class="goods-info">
-      <p>{{goodsItem.title}}</p>
-      <span class="price">{{goodsItem.price}}</span>
-      <span class="collect">{{goodsItem.cfav}}</span>
+      <p>{{ goodsItem.title }}</p>
+      <span class="price">{{ goodsItem.price }}</span>
+      <span class="collect">{{ goodsItem.cfav }}</span>
     </div>
   </div>
 </template>
@@ -18,6 +18,16 @@ export default {
       default() {
         return {};
       },
+    },
+  },
+  methods: {
+    //通过事件总线发送事件,进行监听图片加载
+    itemImgLoad() {
+      this.$bus.$emit("itemImgLoad");
+    },
+    itemClick() {
+      console.log('跳到详情页');
+      this.$router.push('/detail/'+this.goodsItem.iid)
     },
   },
 };

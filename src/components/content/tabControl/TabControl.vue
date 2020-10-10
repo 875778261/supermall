@@ -13,7 +13,7 @@
 
 <script>
 export default {
-  name: "TabControl",
+  name: "TabControl",  
   props: {
     titles: {
       type: Array,
@@ -30,7 +30,7 @@ export default {
   methods: {
     itemClick(index) {
       this.currentIndex = index;
-      console.log(index);
+      console.log('0流行, 1新款, 2精选',index);
       this.$emit('tabClick',index)//将值传出去
     },
   },

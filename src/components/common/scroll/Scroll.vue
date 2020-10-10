@@ -35,25 +35,39 @@ export default {
       pullUpLoad: this.pullUpLoad,
     });
     //2.监听滚动的位置
-    this.scroll.on("scroll", (position) => {
-      //console.log(position);
-      this.$emit("scroll", position);
-    });
-    //3.监听上拉事件
-    this.scroll.on('pullingUp',()=>{
-      console.log('aaa');
-      this.$emit('pullingUp')
-    })
+    if (this.probeType === 2 || this.probeType === 3) {
+      this.scroll.on("scroll", (position) => {
+        //console.log(position);
+        this.$emit("scroll", position);
+      });
+    }
+
+    //3.监听上拉加载更多事件
+
+    //判断是否监听上拉加载
+    if (this.pullUpLoad) {
+      //监听上拉加载
+      this.scroll.on("pullingUp", () => {
+        console.log("Scroll.vue监听到已拉到底部");
+        this.$emit("pullingUp");
+      });
+    }
   },
-  
 
   methods: {
+    //定位滚动位置
     scrollTo(x, y, time = 500) {
-      this.scroll.scrollTo(x, y, time);
+      this.scroll && this.scroll.scrollTo && this.scroll.scrollTo(x, y, time);
     },
-    finishPullUp(){
-      this.scroll.finishPullUp()
-    }
+    finishPullUp() {
+      this.scroll.finishPullUp();
+    },
+    refresh() {
+      this.scroll && this.scroll.refresh && this.scroll.refresh();
+    },
+    getSaveY() {
+      return this.scroll ? this.scroll.y : 0;
+    },
   },
 };
 </script>

@@ -82,5 +82,6 @@ export default {
 .content {
   height: 300px;
   background-color: red;
+  overflow: hidden;
 }
 </style>

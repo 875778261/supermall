@@ -4,21 +4,29 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
+    <tab-control
+      class="tab-control"
+      :titles="['流行', '新款', '精选']"
+      @tabClick="tabClick"
+      ref="tabControl1"
+      v-show="isShowTabControl"
+    />
 
     <scroll
       class="content"
       ref="scroll"
       :probe-type="3"
-      @scroll="contentScroll" :pull-up-load="true"
+      @scroll="contentScroll"
+      :pull-up-load="true"
       @pullingUp="loadMore"
     >
-      <home-swiper :banners="banners" />
+      <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad" />
       <recommend-view :recommends="recommends" />
       <feature-view />
       <tab-control
-        class="tab-control"
         :titles="['流行', '新款', '精选']"
         @tabClick="tabClick"
+        ref="tabControl2"
       />
       <goods-list :goods="showGoods" />
     </scroll>
@@ -38,6 +46,7 @@ import GoodsList from "components/content/goods/GoodsList";
 import BackTop from "components/content/backTop/BackTop";
 
 import { getHomeMultidata, getHomeGoods } from "network/home";
+import { debounce } from "common/utils";
 export default {
   name: "Home",
   data() {
@@ -52,6 +61,9 @@ export default {
       },
       currentType: "pop",
       isShowBackTop: false,
+      tabOffsetTop: 0 /* TabControl需要吸顶位置 */,
+      isShowTabControl: false,
+      saveY: 0,
     };
   },
   computed: {
@@ -78,6 +90,27 @@ export default {
     this.getHomeGoods("new");
     this.getHomeGoods("sell");
   },
+  destroyed() {
+    console.log("home已经被销毁");
+  },
+  deactivated() {
+    console.log("离开Home时的saveY", this.saveY);
+    this.saveY = this.$refs.scroll.getSaveY();
+  },
+  activated() {
+    console.log("重新进入时的saveY", this.saveY);
+    this.$refs.scroll.scrollTo(0, this.saveY, 0);
+    //返回页面时刷新可以避免回弹y0
+    this.$refs.scroll.refresh();
+  },
+  mounted() {
+    //通过事件总线，监听item中图片加载完成，并重新计算高度
+    //common/utils 防抖函数debounce
+    const refresh = debounce(this.$refs.scroll.refresh);
+    this.$bus.$on("itemImgLoad", () => {
+      refresh();
+    });
+  },
   methods: {
     /**
      * 事件监听相关方法
@@ -95,7 +128,10 @@ export default {
           this.currentType = "sell";
           break;
       }
+      this.$refs.tabControl1.currentIndex = index;
+      this.$refs.tabControl2.currentIndex = index;
     },
+
     /**
      * 返回顶部相关方法
      */
@@ -103,21 +139,38 @@ export default {
       this.$refs.scroll.scrollTo(0, 0, 500);
       /* 访问scroll组件中定义的scrollTo方法，传参给Scroll*/
     },
-     //返回顶部按钮隐藏与显示
-    contentScroll(position) {
-      this.isShowBackTop = position.y < -1000;
-    },
-    loadMore(){
-console.log('aaa');
-this.getHomeGoods(this.currentType)
 
+    /**
+     * BScroll内元素的控制
+     */
+    contentScroll(position) {
+      //BackTop的显示与隐藏
+      this.isShowBackTop = position.y < -1000;
+      //TabControl的显示与隐藏
+      this.isShowTabControl =
+        position.y <= -this.$refs.tabControl2.$el.offsetTop;
     },
+    loadMore() {
+      console.log("已执行下拉加载更多");
+      this.getHomeGoods(this.currentType);
+      //记录了当前选中的类型
+    },
+
+    //轮播图加载监听
+    swiperImageLoad() {
+      console.log(
+        "tabControl监听轮播图后高度",
+        this.$refs.tabControl2.$el.offsetTop
+      );
+      this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
+    },
+
     /**
      * 网络请求相关方法
      */
     getHomeMultidata() {
       getHomeMultidata().then((res) => {
-        console.log("res");
+        console.log("请求首页的数据成功");
         this.banners = res.data.banner.list;
         this.recommends = res.data.recommend.list;
       });
@@ -126,13 +179,15 @@ this.getHomeGoods(this.currentType)
       const page = this.goods[type].page + 1;
       getHomeGoods(type, page).then((res) => {
         console.log(
+          "拉取GOODS数据：",
           "res, type, res.data.list,' this.goods[type].list",
           "this.goods"
         );
         this.goods[type].list.push(...res.data.list);
         this.goods[type].page += 1;
 
-        this.$refs.scroll.finishPullUp()
+        //完成上拉加载更多
+        this.$refs.scroll.finishPullUp();
       });
     },
   },
@@ -141,23 +196,31 @@ this.getHomeGoods(this.currentType)
 
 <style scoped>
 #home {
-  padding-top: 44px;
+  /* padding-top: 44px; */
   height: 100vh;
   position: relative;
 }
 .home-nav {
   background-color: var(--color-tint);
   color: white;
-  /* 固定navbar */
-  position: fixed;
+
+  /*浏览器原生滚动时 固定navbar */
+  /* position: fixed;
   left: 0;
   right: 0;
   top: 0;
-  z-index: 9;
+  z-index: 9; */
 }
+/*bs中的tc 使用better-scroll后失效 */
+/* 
 .tab-control {
   position: sticky;
   top: 44px;
+  z-index: 9;
+}
+ */
+.tab-control {
+  position: relative;
   z-index: 9;
 }
 .content {
