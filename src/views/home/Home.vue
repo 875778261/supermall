@@ -43,12 +43,13 @@ import RecommendView from "views/home/childComps/RecommendView";
 import FeatureView from "views/home/childComps/FeatureView";
 import TabControl from "components/content/tabControl/TabControl";
 import GoodsList from "components/content/goods/GoodsList";
-import BackTop from "components/content/backTop/BackTop";
+import { itemListenerMixin, backTopMixin } from "common/mixin";
 
 import { getHomeMultidata, getHomeGoods } from "network/home";
 import { debounce } from "common/utils";
 export default {
   name: "Home",
+  mixins: [itemListenerMixin,backTopMixin],
   data() {
     return {
       scroll: null,
@@ -60,10 +61,10 @@ export default {
         sell: { page: 0, list: [] },
       },
       currentType: "pop",
-      isShowBackTop: false,
       tabOffsetTop: 0 /* TabControl需要吸顶位置 */,
       isShowTabControl: false,
       saveY: 0,
+      itemImgListener: null,
     };
   },
   computed: {
@@ -79,7 +80,6 @@ export default {
     TabControl,
     GoodsList,
     Scroll,
-    BackTop,
   },
   created() {
     //创建组件后
@@ -93,9 +93,24 @@ export default {
   destroyed() {
     console.log("home已经被销毁");
   },
+
+  mounted() {
+    //通过事件总线，监听item中图片加载完成，并重新计算高度
+    //以下混入
+    /* //common/utils 防抖函数debounce
+    const refresh = debounce(this.$refs.scroll.refresh);
+    //对监听的时间进行保存
+    this.itemImgListener = () => {
+      refresh();
+    };
+    this.$bus.$on("itemImgLoad", this.ItemImgListener); */
+  },
   deactivated() {
+    //1.保存saveY
     console.log("离开Home时的saveY", this.saveY);
     this.saveY = this.$refs.scroll.getSaveY();
+    //取消全局事件监听
+    this.$bus.$off("itemImgLoad", this.ItemImgListener);
   },
   activated() {
     console.log("重新进入时的saveY", this.saveY);
@@ -103,14 +118,7 @@ export default {
     //返回页面时刷新可以避免回弹y0
     this.$refs.scroll.refresh();
   },
-  mounted() {
-    //通过事件总线，监听item中图片加载完成，并重新计算高度
-    //common/utils 防抖函数debounce
-    const refresh = debounce(this.$refs.scroll.refresh);
-    this.$bus.$on("itemImgLoad", () => {
-      refresh();
-    });
-  },
+
   methods: {
     /**
      * 事件监听相关方法
@@ -145,7 +153,7 @@ export default {
      */
     contentScroll(position) {
       //BackTop的显示与隐藏
-      this.isShowBackTop = position.y < -1000;
+      this.showBackTop(position);
       //TabControl的显示与隐藏
       this.isShowTabControl =
         position.y <= -this.$refs.tabControl2.$el.offsetTop;

@@ -10,7 +10,7 @@
           :class="{ active: index === currentIndex }"
           @click="titleClick(index)"
           v-for="(item, index) in title"
-        >
+        :key="index">
           {{ item }}
         </div>
       </div>
@@ -24,7 +24,7 @@ export default {
   name: "DetailNavBar",
   data() {
     return {
-      title: ["aa", "aa", "aa", "aa"],
+      title: ["商品", "参数", "评论", "推荐"],
       currentIndex: 0,
     };
   },

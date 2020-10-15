@@ -43,11 +43,11 @@ export default {
     },
   },
   methods: {
-    imgLoad() {
+     imgLoad() {
       if (++this.counter === this.imagesLength) {
         this.$emit("imgLoad");
       }
-    },
+    }, 
   },
 };
 </script>

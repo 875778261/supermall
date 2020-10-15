@@ -19,8 +19,6 @@
     <div class="info-img" v-if="goodsParams.images.length !== 0">
       <img :src="goodsParams.images.images[0]" alt="" />
     </div>
-
-    {{ paramsInfo }}
   </div>
 </template>
 

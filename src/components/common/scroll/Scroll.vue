@@ -14,7 +14,7 @@ export default {
     probeType: {
       type: Number,
       default: 0,
-      /* 监听滚动配置 */
+      /* 监听滚动配置  0.1不监听 2离开时监听 3滚动就监听*/
     },
     pullUpLoad: {
       type: Boolean,
