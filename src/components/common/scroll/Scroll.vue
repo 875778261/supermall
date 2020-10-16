@@ -21,6 +21,8 @@ export default {
       default: false,
       /* 上拉事件配置 */
     },
+    
+    
   },
   data() {
     return {

@@ -9,7 +9,7 @@
 
   <div id="shop-item">
     <div class="item-selector">
-      <check-button :is-checked="product.checked" @click.native="checkClick" />
+      <check-button @click.native="checkClick" :is-checked="product.checked" />
     </div>
     <div class="item-img">
       <img :src="product.img" alt="商品图片" />
@@ -43,8 +43,7 @@ export default {
   },
   methods: {
     checkClick() {
-      this.product.checked = !this.product.checked;
-      console.log(this.product.checked);
+      this.product.checked = !this.product.checked
     },
   },
 };
