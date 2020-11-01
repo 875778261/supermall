@@ -16,7 +16,7 @@ export default {
                  oldProduct = item
              }
          }*/
-    addCart(state, payLoad) {
+    /* addCart(state, payLoad) {
         let oldProduct = state.cartList.find(item => item.iid === payLoad.iid)
 
         if (oldProduct) {
@@ -25,12 +25,12 @@ export default {
             payLoad.count = 1
             payLoad.checked = true
             state.cartList.push(payLoad)
-            /* payLoad.index1 = state.cartList.length - 1 */
         }
+    }, */
+    addCart(state, payLoad) {
+        state.cartList.push(payLoad)
     },
-
-
-
-
-
+    addCounter(state, payLoad) {
+        payLoad.count += 1
+    }
 }

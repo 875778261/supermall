@@ -37,6 +37,7 @@ import DetailParamsInfo from "./childComps/DetailParamsInfo";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
 import DetailBottomBar from "./childComps/DetailBottomBar";
 import GoodsList from "components/content/goods/GoodsList";
+
 import { debounce } from "common/utils";
 import { itemListenerMixin, backTopMixin } from "common/mixin";
 
@@ -78,6 +79,7 @@ export default {
       themeTopYs: [], //各组件元素的顶部所在y坐标
       getThemeTopY: null, //获取各组件元素的顶部所在y坐标
       currentIndex: null,
+      toastIsShow: false,
     };
   },
   created() {
@@ -188,7 +190,18 @@ export default {
       product.desc = this.goods.desc;
       product.price = this.goods.realPrice;
       product.iid = this.iid;
-      this.$store.commit("addCart", product);
+      this.$store.dispatch("addCart", product).then((res) => {
+        console.log(res);
+        this.$toast.show(res, 2000);
+        /*  this.toastIsShow = true;
+        this.toastMessage = res;
+
+        setTimeout(() => {
+          this.toastIsShow = false;
+
+          this.toastMessage = "";
+        }, 1500); */
+      });
     },
   },
   updated() {},

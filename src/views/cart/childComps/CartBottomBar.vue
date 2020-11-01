@@ -100,6 +100,7 @@ export default {
   line-height: 40px;
   display: flex;
   justify-content: space-around;
+  z-index: 99;
 }
 .check-content {
   display: flex;

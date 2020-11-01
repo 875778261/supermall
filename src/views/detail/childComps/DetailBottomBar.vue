@@ -57,6 +57,7 @@ export default {
 
     display: flex;
     text-align: center;
+    z-index: 9;
   }
 
   .bar-item {
